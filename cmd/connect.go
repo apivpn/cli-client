@@ -186,17 +186,17 @@ func ConnectCmd() *cobra.Command {
 				service = v2ray.NewV2Ray(&cfg)
 			}
 
-			//if service != nil && service.IsUp() {
-			//	if err = service.PreDown(); err != nil {
-			//		return err
-			//	}
-			//	if err = service.Down(); err != nil {
-			//		return err
-			//	}
-			//	if err = service.PostDown(); err != nil {
-			//		return err
-			//	}
-			//}
+			if service != nil && service.IsUp() {
+				if err = service.PreDown(); err != nil {
+					return err
+				}
+				if err = service.Down(); err != nil {
+					return err
+				}
+				if err = service.PostDown(); err != nil {
+					return err
+				}
+			}
 
 			nodeQueryClient := nodetypes.NewQueryServiceClient(ctx)
 
@@ -425,12 +425,12 @@ func ConnectCmd() *cobra.Command {
 			if err = service.PreUp(); err != nil {
 				return err
 			}
-			//if err = service.Up(); err != nil {
-			//	return err
-			//}
-			//if err = service.PostUp(); err != nil {
-			//	return err
-			//}
+			if err = service.Up(); err != nil {
+				return err
+			}
+			if err = service.PostUp(); err != nil {
+				return err
+			}
 
 			status = clienttypes.NewStatus().
 				WithFrom(ctx.GetFromName()).
