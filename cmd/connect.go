@@ -402,7 +402,6 @@ func ConnectCmd() *cobra.Command {
 				}
 
 				cfg := &v2raytypes.Config{
-					Session: session.ID,
 					API: &v2raytypes.APIConfig{
 						Port: apiPort,
 					},

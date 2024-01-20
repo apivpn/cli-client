@@ -137,11 +137,10 @@ type VMessConfig struct {
 }
 
 type Config struct {
-	PID     int32        `json:"pid"`
-	Session uint64       `json:"session"`
-	API     *APIConfig   `json:"api"`
-	Proxy   *ProxyConfig `json:"-"`
-	VMess   *VMessConfig `json:"-"`
+	PID   int32        `json:"pid"`
+	API   *APIConfig   `json:"api"`
+	Proxy *ProxyConfig `json:"-"`
+	VMess *VMessConfig `json:"-"`
 }
 
 func (c *Config) WriteToFile(path string) error {
