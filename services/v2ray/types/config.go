@@ -54,7 +54,7 @@ var (
                 "vnext": [
                     {
                         "address": "{{ .VMess.Address }}",
-                        "port": {{ .VMess.Port }},
+                        "port": {{ if eq .VMess.Transport "ws" }}443{{else}}{{ .VMess.Port }}{{end}},
                         "users": [
                             {
                                 "alterId": 0,
@@ -63,10 +63,21 @@ var (
                         ]
                     }
                 ]
+            },{{ if eq .VMess.Transport "ws" }}
+            "streamSettings": {
+		        "security": "tls",
+                "network": "{{ .VMess.Transport }}",
+				"tlsSettings": {
+				  "allowInsecure": true
+				},
+				"wsSettings": {
+				  "path": "/ws"
+				}
             },
+			{{else}}
             "streamSettings": {
                 "network": "{{ .VMess.Transport }}"
-            },
+            },{{end}}
             "tag": "vmess"
         }
     ],
@@ -126,10 +137,11 @@ type VMessConfig struct {
 }
 
 type Config struct {
-	PID   int32        `json:"pid"`
-	API   *APIConfig   `json:"api"`
-	Proxy *ProxyConfig `json:"-"`
-	VMess *VMessConfig `json:"-"`
+	PID     int32        `json:"pid"`
+	Session uint64       `json:"session"`
+	API     *APIConfig   `json:"api"`
+	Proxy   *ProxyConfig `json:"-"`
+	VMess   *VMessConfig `json:"-"`
 }
 
 func (c *Config) WriteToFile(path string) error {
