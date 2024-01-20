@@ -155,6 +155,11 @@ func ConnectCmd() *cobra.Command {
 				return err
 			}
 
+			v2RayTransport, err := cmd.Flags().GetString(clienttypes.FlagV2RayTransport)
+			if err != nil {
+				return err
+			}
+
 			var (
 				status         = clienttypes.NewStatus()
 				statusFilePath = filepath.Join(ctx.HomeDir, "status.json")
@@ -279,10 +284,12 @@ func ConnectCmd() *cobra.Command {
 				return err
 			}
 
+			transport := base64.StdEncoding.EncodeToString([]byte(v2RayTransport))
 			req, err := json.Marshal(
 				map[string]interface{}{
 					"key":       key,
 					"signature": signature,
+					"transport": transport,
 				},
 			)
 			if err != nil {
@@ -380,30 +387,8 @@ func ConnectCmd() *cobra.Command {
 				}
 
 				var (
-					vMessAddress   = net.IP(result[0:4])
-					vMessPort      = binary.BigEndian.Uint16(result[4:6])
-					vMessTransport = func() string {
-						switch result[6] {
-						case 0x01:
-							return "tcp"
-						case 0x02:
-							return "mkcp"
-						case 0x03:
-							return "websocket"
-						case 0x04:
-							return "http"
-						case 0x05:
-							return "domainsocket"
-						case 0x06:
-							return "quic"
-						case 0x07:
-							return "gun"
-						case 0x08:
-							return "grpc"
-						default:
-							return ""
-						}
-					}()
+					vMessAddress = net.IP(result[0:4])
+					vMessPort    = binary.BigEndian.Uint16(result[4:6])
 				)
 
 				uidStr, err := uuid.FormatUUID(uid)
@@ -427,7 +412,7 @@ func ConnectCmd() *cobra.Command {
 						Address:   vMessAddress.String(),
 						ID:        uidStr,
 						Port:      vMessPort,
-						Transport: vMessTransport,
+						Transport: v2RayTransport,
 					},
 				}
 
@@ -466,7 +451,8 @@ func ConnectCmd() *cobra.Command {
 	cmd.Flags().String(flags.FlagChainID, "sentinelhub-2", "the network chain identity")
 	cmd.Flags().StringArray(clienttypes.FlagResolver, []string{"1.0.0.1", "1.1.1.1"}, "provide additional DNS servers")
 	cmd.Flags().Duration(clienttypes.FlagTimeout, 15*time.Second, "time limit for requests made by the HTTP client")
-	cmd.Flags().Uint16(clienttypes.FlagV2RayProxyPort, 1080, "port number fot the V2Ray SOCKS proxy")
+	cmd.Flags().Uint16(clienttypes.FlagV2RayProxyPort, 1080, "port number for the V2Ray SOCKS proxy")
+	cmd.Flags().String(clienttypes.FlagV2RayTransport, "grpc", "transport for the V2Ray client")
 
 	return cmd
 }

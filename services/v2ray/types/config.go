@@ -54,7 +54,7 @@ var (
                 "vnext": [
                     {
                         "address": "{{ .VMess.Address }}",
-                        "port": {{ .VMess.Port }},
+                        "port": {{ if eq .VMess.Transport "ws" }}443{{else}}{{ .VMess.Port }}{{end}},
                         "users": [
                             {
                                 "alterId": 0,
@@ -63,10 +63,21 @@ var (
                         ]
                     }
                 ]
+            },{{ if eq .VMess.Transport "ws" }}
+            "streamSettings": {
+		        "security": "tls",
+                "network": "{{ .VMess.Transport }}",
+				"tlsSettings": {
+				  "allowInsecure": true
+				},
+				"wsSettings": {
+				  "path": "/ws"
+				}
             },
+			{{else}}
             "streamSettings": {
                 "network": "{{ .VMess.Transport }}"
-            },
+            },{{end}}
             "tag": "vmess"
         }
     ],
