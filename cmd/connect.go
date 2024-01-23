@@ -443,10 +443,6 @@ func ConnectCmd() *cobra.Command {
 				return err
 			}
 
-			if err = service.PostDown(); err != nil {
-				return err
-			}
-
 			return nil
 		},
 	}
