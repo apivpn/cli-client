@@ -2,8 +2,10 @@ package v2ray
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/shirou/gopsutil/v3/process"
@@ -27,9 +29,12 @@ func NewV2Ray(cfg *types.Config) *V2Ray {
 	}
 }
 
-func (s *V2Ray) home() string           { return viper.GetString(flags.FlagHome) }
-func (s *V2Ray) configFilePath() string { return filepath.Join(s.home(), types.DefaultConfigFileName) }
-func (s *V2Ray) pid() int32             { return s.cfg.PID }
+func (s *V2Ray) home() string { return viper.GetString(flags.FlagHome) }
+func (s *V2Ray) configFilePath() string {
+	sessionFile := fmt.Sprintf("%v.json", strconv.Itoa(int(s.cfg.Session)))
+	return filepath.Join(s.home(), sessionFile)
+}
+func (s *V2Ray) pid() int32 { return s.cfg.PID }
 
 func (s *V2Ray) Info() []byte {
 	buf, err := json.Marshal(s.cfg)
