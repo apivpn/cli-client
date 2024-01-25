@@ -402,6 +402,7 @@ func ConnectCmd() *cobra.Command {
 				}
 
 				cfg := &v2raytypes.Config{
+					Session: session.ID,
 					API: &v2raytypes.APIConfig{
 						Port: apiPort,
 					},
@@ -424,9 +425,9 @@ func ConnectCmd() *cobra.Command {
 			if err = service.PreUp(); err != nil {
 				return err
 			}
-			if err = service.Up(); err != nil {
-				return err
-			}
+			//if err = service.Up(); err != nil {
+			//	return err
+			//}
 			if err = service.PostUp(); err != nil {
 				return err
 			}
